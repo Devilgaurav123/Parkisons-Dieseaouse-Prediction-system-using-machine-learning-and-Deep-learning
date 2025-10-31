@@ -1,0 +1,586 @@
+/* =========================
+   GLOBAL STYLES
+========================= */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(145deg, #0b1f29, #143844);
+  color: #ffffff;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  padding-bottom: 100px; /* space for footer */
+}
+
+/* =========================
+   NAVBAR
+========================= */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(10, 25, 47, 0.9);
+  padding: 1rem 3rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  color: #00bcd4;
+  font-weight: bold;
+  font-size: 1.6rem;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #00bcd4;
+}
+
+/* =========================
+   HERO SECTION (HOME)
+========================= */
+/* ---------- HOME PAGE ---------- */
+/* ---------- HOME PAGE ENHANCED ---------- */
+.home-container {
+  color: #fff;
+  text-align: center;
+  background: linear-gradient(180deg, #042630, #061f25);
+  padding-bottom: 60px;
+  line-height: 1.6;
+}
+
+.hero-section {
+  padding: 90px 20px 50px;
+}
+
+.hero-title {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #00e0ff;
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  max-width: 850px;
+  margin: 20px auto;
+  color: #cce7e8;
+}
+
+.about-disease {
+  padding: 60px 20px;
+  background: #052e35;
+  color: #d4f6f8;
+}
+
+.about-disease h2 {
+  color: #00e0ff;
+  margin-bottom: 20px;
+}
+
+.features-section {
+  padding: 70px 20px;
+  background: #041e24;
+}
+
+.features-section h2 {
+  color: #00e0ff;
+  margin-bottom: 40px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 25px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.feature-card {
+  background: #063944;
+  border-radius: 18px;
+  padding: 30px;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.25);
+}
+
+.feature-card h3 {
+  color: #00bcd4;
+  margin-bottom: 10px;
+}
+
+.impact-section {
+  background: #052e35;
+  padding: 60px 25px;
+  color: #cfeff1;
+}
+
+.impact-section h2 {
+  color: #00e0ff;
+  margin-bottom: 15px;
+}
+
+.cta-section {
+  background: #041b21;
+  padding: 70px 20px;
+}
+
+.cta-section h2 {
+  color: #00e0ff;
+  margin-bottom: 15px;
+}
+
+.cta-section p {
+  color: #b8dfe6;
+  font-size: 1.1rem;
+}
+
+.cta-btn {
+  background: linear-gradient(90deg, #00bcd4, #0078d7);
+  color: white;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+}
+.cta-btn:hover {
+  transform: translateY(-3px);
+  background: linear-gradient(90deg, #00e0ff, #0099cc);
+}
+
+
+/* =========================
+   UPLOAD PAGE
+========================= */
+.page-container {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.page-title {
+  font-size: 2rem;
+  color: #00bcd4;
+  margin-bottom: 2rem;
+  font-weight: 600;
+}
+
+/* Upload Form Card */
+.upload-form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.upload-card {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 2rem 3rem;
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+  max-width: 600px;
+  width: 100%;
+}
+
+.upload-card h2 {
+  color: #00bcd4;
+  margin-bottom: 1.5rem;
+}
+
+/* Upload buttons */
+.file-upload {
+  display: block;
+  margin: 1rem 0;
+  background: linear-gradient(to right, #00bcd4, #0078ff);
+  padding: 0.8rem 1.5rem;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.file-upload:hover {
+  background: linear-gradient(to right, #0078ff, #00bcd4);
+}
+
+.file-upload input {
+  display: none;
+}
+
+.file-name {
+  color: #a0a0a0;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+/* Checkbox Options */
+.options-section {
+  margin: 1.5rem 0;
+  text-align: left;
+  display: inline-block;
+}
+
+.checkbox-label {
+  display: block;
+  margin: 0.3rem 0;
+  color: #d0d0d0;
+}
+
+.predict-btn {
+  margin-top: 1rem;
+  background: linear-gradient(to right, #00bcd4, #0078ff);
+  border: none;
+  color: white;
+  padding: 0.9rem 2rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.predict-btn:hover {
+  transform: scale(1.05);
+  background: linear-gradient(to right, #0078ff, #00bcd4);
+}
+
+/* Spinner */
+.spinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #00bcd4;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================
+   RESULT PAGE
+========================= */
+.result-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.result-card {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 2rem 3rem;
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+  max-width: 600px;
+  text-align: center;
+  width: 100%;
+}
+
+.result-card h2 {
+  color: #00bcd4;
+}
+
+.image-section {
+  margin-top: 1.5rem;
+}
+
+.image-section img {
+  max-width: 100%;
+  border-radius: 10px;
+  margin-top: 0.5rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.download-btn {
+  margin-top: 1rem;
+  background: linear-gradient(to right, #00bcd4, #0078ff);
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.download-btn:hover {
+  background: linear-gradient(to right, #0078ff, #00bcd4);
+}
+
+/* No Result */
+.no-result {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2rem;
+  border-radius: 12px;
+  width: 60%;
+  margin: 2rem auto;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+/* =========================
+   ABOUT PAGE
+========================= */
+/* ---------- ABOUT PAGE ---------- */
+.about-container {
+  background: linear-gradient(180deg, #03191f, #042630);
+  color: #e0f7fa;
+  text-align: center;
+  padding-bottom: 60px;
+}
+
+.about-hero {
+  padding: 100px 20px 50px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.about-hero h1 {
+  font-size: 2.5rem;
+  color: #00e0ff;
+  margin-bottom: 15px;
+}
+
+.about-hero p {
+  font-size: 1.1rem;
+  color: #b8dfe6;
+}
+
+.about-section {
+  padding: 60px 20px;
+  max-width: 900px;
+  margin: 0 auto;
+  line-height: 1.8;
+}
+
+.about-section.alt {
+  background: #052e35;
+  border-radius: 18px;
+  margin: 40px auto;
+  padding: 70px 30px;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+}
+
+.about-section h2 {
+  color: #00e0ff;
+  margin-bottom: 20px;
+}
+
+.about-list {
+  text-align: left;
+  max-width: 700px;
+  margin: 0 auto;
+  list-style: none;
+  padding-left: 0;
+}
+
+.about-list li {
+  margin-bottom: 10px;
+  background: rgba(0, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px 15px;
+}
+
+.testimonials {
+  background: #041e24;
+  padding: 80px 20px;
+}
+
+.testimonial-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 25px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.testimonial-card {
+  background: #063944;
+  border-radius: 18px;
+  padding: 25px;
+  color: #b8dfe6;
+  font-style: italic;
+  transition: transform 0.3s;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-5px);
+}
+
+.testimonial-card h4 {
+  color: #00e0ff;
+  margin-top: 10px;
+}
+
+.final-cta {
+  text-align: center;
+  padding: 70px 20px;
+}
+
+.final-cta h2 {
+  color: #00e0ff;
+}
+
+.final-cta p {
+  color: #b8dfe6;
+  max-width: 800px;
+  margin: 20px auto;
+}
+
+/* =========================
+   FOOTER
+========================= */
+footer {
+  text-align: center;
+  padding: 1.2rem;
+  background-color: rgba(10, 25, 47, 0.9);
+  color: #ccc;
+  font-size: 0.9rem;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* =========================
+   RESPONSIVE DESIGN
+========================= */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .upload-card {
+    width: 90%;
+    padding: 1.5rem;
+  }
+
+  .result-card {
+    width: 90%;
+  }
+
+  .hero-section h1 {
+    font-size: 2.2rem;
+  }
+
+  .hero-section p {
+    font-size: 1rem;
+  }
+}
+
+/* ---------- AUTH PAGES ---------- */
+.auth-container {
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #041f25, #032830);
+  color: #e0f7fa;
+  text-align: center;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.auth-form input {
+  margin: 10px 0;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  color: #fff;
+  outline: none;
+  font-size: 1rem;
+}
+
+.auth-btn {
+  margin-top: 15px;
+  padding: 12px;
+  background: #00e0ff;
+  color: #03191f;
+  border: none;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.auth-btn:hover {
+  background: #00bcd4;
+  transform: scale(1.05);
+}
+
+.auth-message {
+  margin-top: 10px;
+  color: #00e0ff;
+  font-weight: 500;
+}
+
+.auth-switch {
+  margin-top: 20px;
+  font-size: 0.9rem;
+}
+
+.auth-link {
+  color: #00e0ff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}
+
