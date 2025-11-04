@@ -1,16 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
+import { loginUser } from "../api";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // ✅ If already logged in, redirect to /home directly
+  useEffect(() => {
+    const token = localStorage.getItem("access");
+    if (token) {
+      navigate("/home");
+    }
+  }, [navigate]);
+
+  // Handle input changes
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -19,16 +31,37 @@ export default function Login() {
       return;
     }
 
-    try {
-      // Mock backend authentication
-      console.log("User Logged In:", form);
+    setLoading(true);
+    setMessage("");
 
-      // Example check: accept any credentials for now
-      localStorage.setItem("isLoggedIn", "true");
+    try {
+      const res = await loginUser(form);
+
+      // ✅ Store tokens and user info properly
+      if (res.access) localStorage.setItem("access", res.access);
+      if (res.refresh) localStorage.setItem("refresh", res.refresh);
+      if (res.user) localStorage.setItem("user", JSON.stringify(res.user));
+
       setMessage("✅ Login successful! Redirecting...");
-      setTimeout(() => navigate("/home"), 1000);
+
+      // ✅ Redirect to home page
+      setTimeout(() => {
+        navigate("/home");
+      }, 700);
     } catch (error) {
-      setMessage("❌ Invalid credentials. Try again.");
+      console.error("❌ Login Error:", error);
+      if (error.response && error.response.data) {
+        const data = error.response.data;
+        setMessage(
+          data.error ||
+            data.detail ||
+            "❌ Invalid credentials. Please try again."
+        );
+      } else {
+        setMessage("❌ Server error. Please try again later.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -50,8 +83,8 @@ export default function Login() {
           value={form.password}
           onChange={handleChange}
         />
-        <button type="submit" className="auth-btn">
-          Login
+        <button type="submit" className="auth-btn" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
         </button>
       </form>
       {message && <p className="auth-message">{message}</p>}

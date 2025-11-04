@@ -32,14 +32,17 @@ export default function UploadForm() {
     if (imageFile) formData.append("image_file", imageFile);
     Object.entries(options).forEach(([k, v]) => formData.append(k, v));
 
+    // ✅ Correct token key
+    const token = localStorage.getItem("access");
+
     setLoading(true);
     try {
-      const res = await predictParkinsons(formData);
+      const res = await predictParkinsons(formData, token);
       setResult(res.data);
     } catch (err) {
       console.error("Prediction error:", err);
-      alert("Prediction failed. Check backend connection.");
-      setResult(null); // ensure ResultCard doesn’t crash
+      alert("Prediction failed. Check backend connection or file format.");
+      setResult(null);
     } finally {
       setLoading(false);
     }
@@ -97,7 +100,7 @@ export default function UploadForm() {
         </button>
       </div>
 
-      {/* ✅ Safely render ResultCard */}
+      {/* ✅ Render prediction result */}
       <ResultCard result={result} />
     </div>
   );

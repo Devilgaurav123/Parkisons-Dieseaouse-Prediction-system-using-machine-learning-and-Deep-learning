@@ -187,173 +187,202 @@ body {
 /* =========================
    UPLOAD PAGE
 ========================= */
-.page-container {
-  text-align: center;
-  padding: 4rem 2rem;
-}
-
-.page-title {
-  font-size: 2rem;
-  color: #00bcd4;
-  margin-bottom: 2rem;
-  font-weight: 600;
-}
-
-/* Upload Form Card */
-.upload-form-container {
+/* ===== Modern Upload Page ===== */
+.upload-page {
+  min-height: 100vh;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at top left, #041a24, #071e2e, #020c14);
+  color: #fff;
+  padding: 2rem;
 }
 
 .upload-card {
-  background-color: rgba(255, 255, 255, 0.05);
-  padding: 2rem 3rem;
-  border-radius: 16px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
-  max-width: 600px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 1.5rem;
+  padding: 2.5rem 3rem;
+  max-width: 550px;
   width: 100%;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(16px);
+  animation: fadeIn 0.6s ease;
 }
 
-.upload-card h2 {
-  color: #00bcd4;
-  margin-bottom: 1.5rem;
+.upload-title {
+  font-size: 1.8rem;
+  color: #00e0ff;
+  margin-bottom: 0.4rem;
 }
 
-/* Upload buttons */
-.file-upload {
+.upload-subtitle {
+  color: #9fc1cc;
+  font-size: 0.95rem;
+  margin-bottom: 1.8rem;
+}
+
+.upload-form-modern {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* Stylish Upload Buttons */
+.modern-upload-btn {
   display: block;
-  margin: 1rem 0;
-  background: linear-gradient(to right, #00bcd4, #0078ff);
-  padding: 0.8rem 1.5rem;
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
+  background: linear-gradient(90deg, #00c6ff, #0072ff);
+  color: #fff;
   font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.file-upload:hover {
-  background: linear-gradient(to right, #0078ff, #00bcd4);
-}
-
-.file-upload input {
-  display: none;
-}
-
-.file-name {
-  color: #a0a0a0;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-}
-
-/* Checkbox Options */
-.options-section {
-  margin: 1.5rem 0;
-  text-align: left;
-  display: inline-block;
-}
-
-.checkbox-label {
-  display: block;
-  margin: 0.3rem 0;
-  color: #d0d0d0;
-}
-
-.predict-btn {
-  margin-top: 1rem;
-  background: linear-gradient(to right, #00bcd4, #0078ff);
   border: none;
-  color: white;
-  padding: 0.9rem 2rem;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 600;
+  padding: 0.9rem 1.2rem;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  text-align: center;
+  transition: all 0.25s ease-in-out;
+  box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3);
+}
+.modern-upload-btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(90deg, #00e0ff, #0072ff);
+  box-shadow: 0 6px 20px rgba(0, 224, 255, 0.4);
 }
 
-.predict-btn:hover {
-  transform: scale(1.05);
-  background: linear-gradient(to right, #0078ff, #00bcd4);
+/* Predict Button */
+.modern-predict-btn {
+  background: linear-gradient(90deg, #00e6a8, #00b3ff);
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  padding: 0.9rem 1.5rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 20px rgba(0, 255, 196, 0.25);
+}
+.modern-predict-btn:hover {
+  transform: scale(1.04);
+  background: linear-gradient(90deg, #00ffc8, #009cff);
+  box-shadow: 0 8px 30px rgba(0, 255, 196, 0.35);
+}
+.modern-predict-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-/* Spinner */
-.spinner {
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #00bcd4;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  animation: spin 0.8s linear infinite;
-  display: inline-block;
+/* Error message */
+.error-message {
+  margin-top: 1rem;
+  color: #ff7070;
+  font-size: 0.9rem;
 }
 
-@keyframes spin {
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 /* =========================
    RESULT PAGE
 ========================= */
-.result-container {
+/* ===== Result Page Styling ===== */
+.result-page {
   display: flex;
+  align-items: center;
   justify-content: center;
-  margin-top: 2rem;
+  min-height: 90vh;
+  background: radial-gradient(circle at top left, #031822, #082434, #020d17);
+  color: #fff;
+  padding: 2rem;
 }
 
-.result-card {
-  background-color: rgba(255, 255, 255, 0.05);
-  padding: 2rem 3rem;
-  border-radius: 16px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
-  max-width: 600px;
-  text-align: center;
+.result-card-modern {
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 1.5rem;
+  padding: 2.5rem 3rem;
+  max-width: 700px;
   width: 100%;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
+  animation: fadeIn 0.8s ease-in-out;
 }
 
-.result-card h2 {
-  color: #00bcd4;
+.result-title {
+  font-size: 2rem;
+  color: #00d9ff;
+  margin-bottom: 1rem;
 }
 
-.image-section {
+.result-status h3 {
+  font-size: 1.4rem;
+  margin: 0.8rem 0;
+}
+
+.result-good {
+  color: #1eff9b;
+}
+
+.result-bad {
+  color: #ff6b6b;
+}
+
+.user-info {
+  margin-top: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: 10px;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.image-preview {
   margin-top: 1.5rem;
 }
 
-.image-section img {
+.image-preview img {
   max-width: 100%;
   border-radius: 10px;
   margin-top: 0.5rem;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 20px rgba(0, 255, 255, 0.2);
 }
 
-.download-btn {
-  margin-top: 1rem;
-  background: linear-gradient(to right, #00bcd4, #0078ff);
-  color: white;
-  padding: 0.8rem 1.5rem;
-  border: none;
-  border-radius: 10px;
+/* 📄 Download Button */
+.download-report-btn {
+  margin-top: 1.8rem;
+  background: linear-gradient(90deg, #00c6ff, #0072ff);
+  color: #fff;
   font-weight: 600;
-  cursor: pointer;
-}
-
-.download-btn:hover {
-  background: linear-gradient(to right, #0078ff, #00bcd4);
-}
-
-/* No Result */
-.no-result {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 2rem;
+  border: none;
+  padding: 0.9rem 1.5rem;
   border-radius: 12px;
-  width: 60%;
-  margin: 2rem auto;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-  text-align: center;
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+  box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3);
 }
+.download-report-btn:hover {
+  transform: scale(1.05);
+  background: linear-gradient(90deg, #00e0ff, #0096ff);
+  box-shadow: 0 6px 25px rgba(0, 224, 255, 0.4);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 
 /* =========================
    ABOUT PAGE

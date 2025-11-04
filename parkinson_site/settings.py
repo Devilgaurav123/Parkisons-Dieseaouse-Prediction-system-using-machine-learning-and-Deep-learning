@@ -36,6 +36,12 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",   # React default
+    "http://127.0.0.1:5173",   # Vite default
+]
+
+
 
 
 # Application definition

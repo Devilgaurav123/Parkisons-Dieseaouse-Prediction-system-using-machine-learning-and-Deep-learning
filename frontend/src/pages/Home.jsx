@@ -1,9 +1,27 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "../App.css";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const navigate = useNavigate();
+
+  // ✅ Redirect to login if user is not authenticated
+  useEffect(() => {
+    const token = localStorage.getItem("access");
+    if (!token) {
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  // ✅ Handles navigation with authentication check
+  const handleStartPrediction = () => {
+    const token = localStorage.getItem("access");
+    if (token) {
+      navigate("/upload");
+    } else {
+      navigate("/login");
+    }
+  };
 
   return (
     <div className="home-container">
@@ -14,7 +32,7 @@ const Home = () => {
           analysis of voice and MRI data — bringing accuracy, speed, and confidence
           to both patients and healthcare providers.
         </p>
-        <button className="cta-btn" onClick={() => navigate("/upload")}>
+        <button className="cta-btn" onClick={handleStartPrediction}>
           🚀 Start Prediction
         </button>
       </header>
@@ -80,7 +98,7 @@ const Home = () => {
           Early intervention can make a life-changing difference. Upload your voice or MRI data
           and let our intelligent system assist you in identifying early signs of Parkinson’s.
         </p>
-        <button className="cta-btn" onClick={() => navigate("/upload")}>
+        <button className="cta-btn" onClick={handleStartPrediction}>
           Upload Data Now
         </button>
       </section>

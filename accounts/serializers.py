@@ -17,6 +17,10 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'full_name', 'email', 'phone', 'password', 'password2')
+        extra_kwargs = {
+            'full_name': {'required': False},
+            'phone': {'required': False},
+        }
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
@@ -24,8 +28,28 @@ class RegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        validated_data.pop('password2')
-        user = User.objects.create_user(**validated_data)
+        # Remove password2 before user creation
+        password = validated_data.pop('password')
+        validated_data.pop('password2', None)
+
+        # Handle optional fields safely
+        full_name = validated_data.pop('full_name', '')
+        phone = validated_data.pop('phone', '')
+
+        # Create user instance
+        user = User.objects.create(
+            username=validated_data.get('username'),
+            email=validated_data.get('email'),
+        )
+
+        # Add optional fields if exist in model
+        if hasattr(user, 'full_name'):
+            user.full_name = full_name
+        if hasattr(user, 'phone'):
+            user.phone = phone
+
+        user.set_password(password)
+        user.save()
         return user
 
 

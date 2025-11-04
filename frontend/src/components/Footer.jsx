@@ -4,8 +4,8 @@ import "./Footer.css";
 function Footer() {
   return (
     <footer className="footer">
-      <p>© {new Date().getFullYear()} Parkinson’s Detection System</p>
-      <p>Developed using Django REST & React</p>
+      <p>© {new Date().getFullYear()} NeuroPredict — Parkinson’s Detection System</p>
+      <p>Developed with Django REST Framework & React</p>
     </footer>
   );
 }
