@@ -25,50 +25,100 @@ body {
 /* =========================
    NAVBAR
 ========================= */
+/* ===== Navbar Styling ===== */
 .navbar {
+  width: 100%;
+  background-color: #061a2b;
+  color: white;
+  padding: 0.8rem 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-container {
+  width: 100%;
+  max-width: 1200px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: rgba(10, 25, 47, 0.9);
-  padding: 1rem 3rem;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
-  position: sticky;
-  top: 0;
-  z-index: 100;
 }
 
-.logo {
-  color: #00bcd4;
-  font-weight: bold;
-  font-size: 1.6rem;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-}
-
-.nav-links {
-  list-style: none;
+/* Left: Logo Section */
+.navbar-logo {
   display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 0.5rem;
+}
+
+.navbar-logo-icon {
+  font-size: 1.8rem;
+}
+
+.navbar-logo-text {
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #00d9ff;
+}
+
+/* Right: Menu Links */
+.navbar-links {
+  display: flex;
+  list-style: none;
   gap: 2rem;
+  align-items: center;
   margin: 0;
   padding: 0;
 }
 
-.nav-links a {
-  color: #ffffff;
+.navbar-links li a {
   text-decoration: none;
+  color: #fff;
   font-weight: 500;
   transition: color 0.3s ease;
 }
 
-.nav-links a:hover {
-  color: #00bcd4;
+.navbar-links li a:hover {
+  color: #00d9ff;
+}
+
+/* Logout Button */
+.logout-btn {
+  background-color: transparent;
+  border: 1px solid #00d9ff;
+  color: #fff;
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #00d9ff;
+  color: #00131a;
+}
+
+/* Responsive Navbar */
+@media (max-width: 768px) {
+  .navbar-container {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .navbar-links {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }
 
 /* =========================
    HERO SECTION (HOME)
 ========================= */
-/* ---------- HOME PAGE ---------- */
-/* ---------- HOME PAGE ENHANCED ---------- */
 .home-container {
   color: #fff;
   text-align: center;
@@ -187,39 +237,41 @@ body {
 /* =========================
    UPLOAD PAGE
 ========================= */
-/* ===== Modern Upload Page ===== */
 .upload-page {
-  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: radial-gradient(circle at top left, #041a24, #071e2e, #020c14);
   color: #fff;
+  min-height: 80vh; /* Limit the section height to fit within the page */
   padding: 2rem;
+  box-sizing: border-box;
 }
 
 .upload-card {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 1.5rem;
-  padding: 2.5rem 3rem;
-  max-width: 550px;
+  padding: 2rem;
+  max-width: 400px;  /* Reduce the width to make the card more compact */
   width: 100%;
   text-align: center;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(16px);
   animation: fadeIn 0.6s ease;
+  margin-top: 0;  /* Prevent card from being pushed down */
+  margin-bottom: 0;
 }
 
 .upload-title {
-  font-size: 1.8rem;
+  font-size: 1.6rem;  /* Reduce font size to fit better */
   color: #00e0ff;
   margin-bottom: 0.4rem;
 }
 
 .upload-subtitle {
   color: #9fc1cc;
-  font-size: 0.95rem;
-  margin-bottom: 1.8rem;
+  font-size: 0.9rem;  /* Adjusted font size for better fit */
+  margin-bottom: 1.5rem;
 }
 
 .upload-form-modern {
@@ -228,31 +280,30 @@ body {
   gap: 1.2rem;
 }
 
-/* Stylish Upload Buttons */
 .modern-upload-btn {
   display: block;
   background: linear-gradient(90deg, #00c6ff, #0072ff);
   color: #fff;
-  font-weight: 600;
+  font-weight: 500;
   border: none;
-  padding: 0.9rem 1.2rem;
+  padding: 0.8rem 1.2rem;  /* Reduced padding to make buttons more compact */
   border-radius: 12px;
   cursor: pointer;
   text-align: center;
   transition: all 0.25s ease-in-out;
   box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3);
 }
+
 .modern-upload-btn:hover {
   transform: translateY(-2px);
   background: linear-gradient(90deg, #00e0ff, #0072ff);
   box-shadow: 0 6px 20px rgba(0, 224, 255, 0.4);
 }
 
-/* Predict Button */
 .modern-predict-btn {
   background: linear-gradient(90deg, #00e6a8, #00b3ff);
   color: #fff;
-  font-weight: 700;
+  font-weight: 500;
   border: none;
   padding: 0.9rem 1.5rem;
   border-radius: 12px;
@@ -260,17 +311,18 @@ body {
   transition: all 0.3s ease-in-out;
   box-shadow: 0 4px 20px rgba(0, 255, 196, 0.25);
 }
+
 .modern-predict-btn:hover {
   transform: scale(1.04);
   background: linear-gradient(90deg, #00ffc8, #009cff);
   box-shadow: 0 8px 30px rgba(0, 255, 196, 0.35);
 }
+
 .modern-predict-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* Error message */
 .error-message {
   margin-top: 1rem;
   color: #ff7070;
@@ -288,51 +340,118 @@ body {
   }
 }
 
+/* Mobile and Tablet Responsiveness */
+@media (max-width: 768px) {
+  .upload-card {
+    max-width: 100%;
+    padding: 2rem;
+  }
+
+  .upload-title {
+    font-size: 1.4rem;  /* Smaller title size for mobile */
+  }
+
+  .upload-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .modern-upload-btn {
+    padding: 0.8rem 1.2rem;
+  }
+
+  .modern-predict-btn {
+    padding: 0.8rem 1.4rem;
+  }
+}
+
+/* Very Small Screens */
+@media (max-width: 480px) {
+  .upload-card {
+    max-width: 100%;
+    padding: 1.5rem;
+  }
+
+  .upload-title {
+    font-size: 1.3rem;
+  }
+
+  .upload-subtitle {
+    font-size: 0.8rem;
+  }
+
+  .modern-upload-btn {
+    padding: 0.7rem 1rem;
+  }
+
+  .modern-predict-btn {
+    padding: 0.7rem 1.2rem;
+  }
+}
+
 /* =========================
    RESULT PAGE
 ========================= */
-/* ===== Result Page Styling ===== */
-.result-page {
+
+/* Wrapper for the entire page layout */
+.page-container {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 90vh;
-  background: radial-gradient(circle at top left, #031822, #082434, #020d17);
-  color: #fff;
-  padding: 2rem;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
+/* Result page positioning */
+.result-page {
+  display: flex;
+  align-items: center; /* Vertically center */
+  justify-content: center; /* Horizontally center */
+  flex-grow: 1; /* Take up available space between navbar and footer */
+  background: radial-gradient(circle at top left, #031822, #082434, #020d17); /* Background gradient */
+  color: #fff;
+  text-align: center; /* Center text */
+  margin-top: 60px; /* Ensure there’s a gap between navbar and result section */
+  margin-bottom: 60px; /* Ensure there’s a gap between result section and footer */
+  padding: 2rem 0; /* Padding for spacing inside result section */
+}
+
+/* Styling the result card container */
 .result-card-modern {
   background: rgba(255, 255, 255, 0.07);
   border-radius: 1.5rem;
-  padding: 2.5rem 3rem;
-  max-width: 700px;
+  padding: 2rem 2.5rem; /* Reduced padding for smaller card */
+  max-width: 500px; /* Reduce max width for a smaller card */
   width: 100%;
-  text-align: center;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(10px); /* Reduced blur effect */
   animation: fadeIn 0.8s ease-in-out;
+  text-align: center; /* Center the text inside */
+  margin-left: auto;
+  margin-right: auto; /* Center horizontally */
 }
 
+/* Title of the result section */
 .result-title {
-  font-size: 2rem;
+  font-size: 1.8rem; /* Reduced font size for the title */
   color: #00d9ff;
   margin-bottom: 1rem;
 }
 
+/* Styling for the status message (good/bad result) */
 .result-status h3 {
-  font-size: 1.4rem;
+  font-size: 1.2rem; /* Reduced font size for status */
   margin: 0.8rem 0;
 }
 
+/* Styling for good results (healthy) */
 .result-good {
   color: #1eff9b;
 }
 
+/* Styling for bad results (Parkinson's detected) */
 .result-bad {
   color: #ff6b6b;
 }
 
+/* User information box style */
 .user-info {
   margin-top: 1.5rem;
   background: rgba(255, 255, 255, 0.05);
@@ -342,18 +461,19 @@ body {
   font-size: 0.95rem;
 }
 
+/* Image preview section (spectrogram, heatmap) */
 .image-preview {
   margin-top: 1.5rem;
 }
 
 .image-preview img {
-  max-width: 100%;
+  max-width: 100%; /* Ensure the image does not overflow */
   border-radius: 10px;
   margin-top: 0.5rem;
   box-shadow: 0 4px 20px rgba(0, 255, 255, 0.2);
 }
 
-/* 📄 Download Button */
+/* Button to download the report */
 .download-report-btn {
   margin-top: 1.8rem;
   background: linear-gradient(90deg, #00c6ff, #0072ff);
@@ -366,12 +486,15 @@ body {
   transition: 0.3s ease-in-out;
   box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3);
 }
+
+/* Hover effect on the button */
 .download-report-btn:hover {
   transform: scale(1.05);
   background: linear-gradient(90deg, #00e0ff, #0096ff);
   box-shadow: 0 6px 25px rgba(0, 224, 255, 0.4);
 }
 
+/* Fade in animation for the result card */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -380,6 +503,22 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Responsive layout for mobile */
+@media (max-width: 768px) {
+  .result-card-modern {
+    padding: 1.5rem 2rem; /* Reduced padding for mobile */
+    width: 90%;
+  }
+
+  .result-title {
+    font-size: 1.5rem; /* Reduced title size for mobile */
+  }
+
+  .result-status h3 {
+    font-size: 1.1rem; /* Reduced status font size */
   }
 }
 

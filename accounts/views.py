@@ -8,9 +8,9 @@ from .serializers import RegisterSerializer, UserSerializer
 
 User = get_user_model()
 
-# ----------------------------
-# Register View
-# ----------------------------
+# ---------------------------- 
+# Register View (handles user registration)
+# ---------------------------- 
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
@@ -29,8 +29,8 @@ class RegisterView(generics.CreateAPIView):
 
 
 # ----------------------------
-# Login View
-# ----------------------------
+# Login View (handles user login)
+# ---------------------------- 
 class LoginView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -41,10 +41,8 @@ class LoginView(APIView):
         if not email or not password:
             return Response({"error": "Email and password are required."}, status=400)
 
-        # Try to authenticate user
         user = authenticate(request, email=email, password=password)
 
-        # If authenticate() fails, manually verify credentials
         if user is None:
             try:
                 user_obj = User.objects.get(email=email)
@@ -64,8 +62,8 @@ class LoginView(APIView):
 
 
 # ----------------------------
-# Profile View
-# ----------------------------
+# Profile View (handles fetching logged-in user details)
+# ---------------------------- 
 class ProfileView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]

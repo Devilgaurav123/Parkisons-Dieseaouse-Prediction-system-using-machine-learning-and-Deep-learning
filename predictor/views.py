@@ -16,7 +16,6 @@ from . import utils
 # Ensure media folder exists
 os.makedirs(getattr(settings, "MEDIA_ROOT", "media"), exist_ok=True)
 
-
 class PredictAPIView(APIView):
     """
     Main prediction endpoint.
@@ -47,6 +46,7 @@ class PredictAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        # Extract flags and data
         use_audio = serializer.validated_data.get("use_audio", True)
         use_image = serializer.validated_data.get("use_image", False)
         combine_features = serializer.validated_data.get("combine_features", True)
@@ -54,11 +54,12 @@ class PredictAPIView(APIView):
         return_heatmap = serializer.validated_data.get("return_heatmap", False)
         generate_report = serializer.validated_data.get("generate_report", False)
 
-        # ✅ User information fields
+        # User info
         name = serializer.validated_data.get("name", "Unknown")
         age = serializer.validated_data.get("age", "N/A")
         gender = serializer.validated_data.get("gender", "N/A")
 
+        # File handling
         audio_file = serializer.validated_data.get("audio_file", None)
         image_file = serializer.validated_data.get("image_file", None)
 
@@ -154,7 +155,7 @@ class PredictAPIView(APIView):
                 "details": details,
             }
 
-            # --- REPORT GENERATION UPDATED ---
+            # --- REPORT GENERATION ---
             if generate_report:
                 try:
                     user_info = {
@@ -190,6 +191,7 @@ class PredictAPIView(APIView):
             return Response(resp, status=status.HTTP_200_OK)
 
         finally:
+            # Clean up temporary files
             for p in (tmp_audio_path, tmp_image_path):
                 try:
                     if p and os.path.exists(p):

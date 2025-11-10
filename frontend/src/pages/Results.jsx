@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import "../App.css";
-import { fetchResults } from "../api";
+import "../App.css"; // Assuming styles are in App.css
+import { fetchResults } from "../api"; // Make sure this import path is correct
 
 const Results = () => {
   const [result, setResult] = useState(null);
@@ -13,10 +13,10 @@ const Results = () => {
         // ✅ Load latest result from localStorage or backend
         const storedResult = localStorage.getItem("latest_result");
         if (storedResult) {
-          setResult(JSON.parse(storedResult));
+          setResult(JSON.parse(storedResult)); // Parse and set result from localStorage
         } else {
-          const data = await fetchResults();
-          setResult(data[data.length - 1] || null);
+          const data = await fetchResults(); // Call the API to get fresh results
+          setResult(data[data.length - 1] || null); // Set the latest result (if any)
         }
       } catch (err) {
         console.error("❌ Error loading results:", err);
@@ -25,31 +25,34 @@ const Results = () => {
         setLoading(false);
       }
     };
-    loadResults();
+    loadResults(); // Execute the function when the component mounts
   }, []);
 
-  if (loading)
+  if (loading) {
     return (
       <div className="result-wrapper">
         <p className="loading">⏳ Fetching your prediction result...</p>
       </div>
     );
+  }
 
-  if (error)
+  if (error) {
     return (
       <div className="result-wrapper">
         <h1 className="page-title">Prediction Result</h1>
         <p className="error-message">{error}</p>
       </div>
     );
+  }
 
-  if (!result)
+  if (!result) {
     return (
       <div className="result-wrapper">
         <h1 className="page-title">Prediction Result</h1>
         <p>No prediction found. Please upload your data first.</p>
       </div>
     );
+  }
 
   const isParkinsons =
     result.result?.toLowerCase().includes("parkinson") ||

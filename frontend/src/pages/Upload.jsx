@@ -1,7 +1,9 @@
+// src/pages/Upload.jsx
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
-import { predictParkinsons, getSpectrogram } from "../api";
+import { predictParkinsons } from "../api";
 
 export default function Upload() {
   const [audioFile, setAudioFile] = useState(null);
@@ -10,13 +12,8 @@ export default function Upload() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleAudioChange = (e) => {
-    setAudioFile(e.target.files[0]);
-  };
-
-  const handleImageChange = (e) => {
-    setImageFile(e.target.files[0]);
-  };
+  const handleAudioChange = (e) => setAudioFile(e.target.files[0]);
+  const handleImageChange = (e) => setImageFile(e.target.files[0]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,16 +37,28 @@ export default function Upload() {
     formData.append("generate_report", true);
 
     try {
-      if (audioFile) {
-        await getSpectrogram(formData);
+      const prediction = await predictParkinsons(formData);
+      console.log("✅ Prediction data:", prediction);
+
+      // Verify we got a report URL
+      const reportAvailable = prediction?.data?.report_url;
+      if (!reportAvailable) {
+        setError("❌ No report generated.");
       }
 
-      const prediction = await predictParkinsons(formData);
-      localStorage.setItem("latest_result", JSON.stringify(prediction));
-      navigate("/results");
+      // Save result safely for Results page
+      localStorage.setItem("latest_result", JSON.stringify(prediction.data));
+
+      // Delay slightly to avoid race with navigation
+      setTimeout(() => navigate("/results"), 300);
     } catch (err) {
       console.error("❌ Upload error:", err);
-      setError("❌ Failed to connect to backend. Please check your server.");
+      if (err.response?.status === 401) {
+        setError("⚠️ Session expired. Please login again.");
+        setTimeout(() => navigate("/login"), 2000);
+      } else {
+        setError("❌ Could not connect to backend. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -60,8 +69,8 @@ export default function Upload() {
       <div className="upload-card">
         <h2 className="upload-title">🧠 Upload Data for Prediction</h2>
         <p className="upload-subtitle">
-          Upload your <strong>voice sample (.wav)</strong> or{" "}
-          <strong>MRI image (.jpg / .png)</strong> to get AI-based predictions.
+          Upload your <strong>voice sample (.wav)</strong> and/or{" "}
+          <strong>MRI image (.png / .jpg)</strong> to get AI-based predictions.
         </p>
 
         <form onSubmit={handleSubmit} className="upload-form-modern">

@@ -1,72 +1,91 @@
+// src/api.js
 import axios from "axios";
 
-// ✅ Base URL — your Django backend
+// ✅ Base URL — Django backend
 const API_BASE = "http://127.0.0.1:8000/api";
 const PREDICTOR_API = `${API_BASE}/predictor`;
-const AUTH_API = `${API_BASE}/accounts`;
+const AUTH_API = `${API_BASE}/auth`; // Correct endpoint for auth routes
 
-// ✅ Helper function to attach token consistently
+// ✅ Helper: Attach auth token safely
 const authHeader = () => {
   const token = localStorage.getItem("access");
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-// 🧠 Parkinson’s Prediction
+// 🧠 Predict Parkinson’s Disease
 export const predictParkinsons = async (formData) => {
-  const headers = {
-    "Content-Type": "multipart/form-data",
-    ...authHeader(),
-  };
-
-  const response = await axios.post(`${PREDICTOR_API}/predict/`, formData, { headers });
-  return response; // return full response (not .data)
+  const headers = { "Content-Type": "multipart/form-data", ...authHeader() };
+  try {
+    const response = await axios.post(`${PREDICTOR_API}/predict/`, formData, { headers });
+    return response;
+  } catch (error) {
+    return handleApiError(error, "Prediction failed");
+  }
 };
 
-// 🎵 Generate Spectrogram
-export const getSpectrogram = async (formData) => {
-  const headers = {
-    "Content-Type": "multipart/form-data",
-    ...authHeader(),
-  };
-
-  const response = await axios.post(`${PREDICTOR_API}/spectrogram/`, formData, {
-    headers,
-    responseType: "blob",
-  });
-
-  return URL.createObjectURL(response.data);
-};
-
-// 🔐 User Registration
-export const registerUser = async (userData) => {
-  const response = await axios.post(`${AUTH_API}/register/`, userData);
-  return response.data;
+// 📊 Fetch Results
+export const fetchResults = async () => {
+  const headers = { ...authHeader() };
+  try {
+    const response = await axios.get(`${PREDICTOR_API}/results/`, { headers });
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "Failed to fetch results");
+  }
 };
 
 // 🔐 User Login
-export const loginUser = async (credentials) => {
-  const response = await axios.post(`${AUTH_API}/login/`, credentials);
-
-  // ✅ Store access and refresh tokens
-  if (response.data.access && response.data.refresh) {
-    localStorage.setItem("access", response.data.access);
-    localStorage.setItem("refresh", response.data.refresh);
-  } else if (response.data.token) {
-    // fallback if backend returns single token
-    localStorage.setItem("access", response.data.token);
+export const loginUser = async (formData) => {
+  try {
+    const response = await axios.post(`${AUTH_API}/login/`, formData);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "Login failed");
   }
-
-  // optional: store user info if backend sends it
-  if (response.data.user) {
-    localStorage.setItem("user", JSON.stringify(response.data.user));
-  }
-
-  return response.data;
 };
 
-// 🧩 Fetch Past Prediction Results
-export const fetchResults = async () => {
-  const headers = authHeader();
-  const response = await axios.get(`${PREDICTOR_API}/results/`, { headers });
-  return response.data;
+// 🧍‍♂️ User Registration
+export const registerUser = async (formData) => {
+  try {
+    const response = await axios.post(`${AUTH_API}/register/`, formData);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "Registration failed");
+  }
+};
+
+// 🧩 Centralized error handler
+const handleApiError = (error, fallbackMessage) => {
+  console.error("API Error:", error);
+
+  // Default response object
+  const safeResponse = { success: false, error: fallbackMessage };
+
+  if (error.response) {
+    const data = error.response.data;
+
+    // HTML error (like 404 pages)
+    if (typeof data === "string" && data.startsWith("<!DOCTYPE html")) {
+      safeResponse.error = `${fallbackMessage}. Server route not found.`;
+      return safeResponse;
+    }
+
+    // Django REST validation error
+    if (typeof data === "object") {
+      const combined = Object.values(data).flat().join(" ");
+      safeResponse.error = `${fallbackMessage}. ${combined}`;
+      return safeResponse;
+    }
+
+    safeResponse.error = data?.error || fallbackMessage;
+    return safeResponse;
+  }
+
+  if (error.request) {
+    safeResponse.error = "Server unreachable. Please check your backend connection.";
+    return safeResponse;
+  }
+
+  safeResponse.error = fallbackMessage;
+  return safeResponse;
 };

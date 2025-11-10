@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+// src/pages/Login.jsx
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
-import { loginUser } from "../api";
+import { loginUser } from "../api"; // Ensure this API is correct
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -9,20 +10,12 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // ✅ If already logged in, redirect to /home directly
-  useEffect(() => {
-    const token = localStorage.getItem("access");
-    if (token) {
-      navigate("/home");
-    }
-  }, [navigate]);
-
-  // Handle input changes
+  // ✅ Handle input change
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Handle form submit
+  // ✅ Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -37,17 +30,12 @@ export default function Login() {
     try {
       const res = await loginUser(form);
 
-      // ✅ Store tokens and user info properly
       if (res.access) localStorage.setItem("access", res.access);
       if (res.refresh) localStorage.setItem("refresh", res.refresh);
       if (res.user) localStorage.setItem("user", JSON.stringify(res.user));
 
       setMessage("✅ Login successful! Redirecting...");
-
-      // ✅ Redirect to home page
-      setTimeout(() => {
-        navigate("/home");
-      }, 700);
+      setTimeout(() => navigate("/home", { replace: true }), 500);
     } catch (error) {
       console.error("❌ Login Error:", error);
       if (error.response && error.response.data) {

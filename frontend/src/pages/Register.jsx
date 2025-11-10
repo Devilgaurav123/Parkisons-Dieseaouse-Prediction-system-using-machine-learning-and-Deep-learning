@@ -1,3 +1,5 @@
+// src/pages/Register.jsx
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
@@ -17,7 +19,7 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // ✅ If already logged in, redirect directly to home
+  // ✅ Redirect to /home if already logged in
   useEffect(() => {
     const token = localStorage.getItem("access");
     if (token) {
@@ -25,15 +27,16 @@ export default function Register() {
     }
   }, [navigate]);
 
-  // Handle input change
+  // 📝 Handle input changes
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Handle form submit
+  // 🚀 Handle registration
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Basic validations
     if (!form.username || !form.email || !form.password || !form.password2) {
       setMessage("⚠️ Please fill all required fields.");
       return;
@@ -48,17 +51,15 @@ export default function Register() {
     setMessage("");
 
     try {
+      // API call to backend
       const res = await registerUser(form);
+      console.log("✅ Registration response:", res);
 
-      // ✅ Save tokens & user info if backend returns them
-      if (res.access) localStorage.setItem("access", res.access);
-      if (res.refresh) localStorage.setItem("refresh", res.refresh);
-      if (res.user) localStorage.setItem("user", JSON.stringify(res.user));
+      // 🟢 Success message
+      setMessage("✅ Registration successful! Redirecting to login...");
 
-      setMessage("✅ Registration successful! Redirecting...");
-
-      // ✅ After successful registration → redirect to home
-      setTimeout(() => navigate("/home"), 1200);
+      // ✅ Wait 1.2 seconds, then redirect to login page
+      setTimeout(() => navigate("/login"), 1200);
     } catch (error) {
       console.error("❌ Registration Error:", error);
 
@@ -84,6 +85,7 @@ export default function Register() {
   return (
     <div className="auth-container">
       <h1>🧾 User Registration</h1>
+
       <form onSubmit={handleSubmit} className="auth-form">
         <input
           type="text"

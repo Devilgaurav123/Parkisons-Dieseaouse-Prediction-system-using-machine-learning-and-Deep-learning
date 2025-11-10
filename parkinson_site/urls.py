@@ -6,6 +6,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # ✅ Add these two includes
-    path('api/accounts/', include('accounts.urls')),
+    path('api/auth/', include('accounts.urls')),
     path('api/predictor/', include('predictor.urls')),
 ]
