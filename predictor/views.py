@@ -246,7 +246,7 @@ class ReportAPIView(APIView):
             details = {}
             audio_result = image_result = fused_result = None
 
-            # audio
+            # audio prediction
             if use_audio and audio_file:
                 tmp_audio = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
                 tmp_audio.write(audio_file.read())
@@ -260,7 +260,7 @@ class ReportAPIView(APIView):
                 except Exception:
                     spectrogram_bytes = None
 
-            # image
+            # image prediction
             if use_image and image_file:
                 tmp_image = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
                 tmp_image.write(image_file.read())
@@ -278,13 +278,13 @@ class ReportAPIView(APIView):
                 except Exception as e:
                     details["image_error"] = f"Cannot open image: {str(e)}"
 
-            # fuse
+            # fused prediction
             if tmp_audio_path and tmp_image_path:
                 fused_result, fused_err = utils.predict_fused(tmp_audio_path, tmp_image_path)
                 if fused_err:
                     details["fusion_error"] = fused_err
 
-            # summary
+            # final label and confidence
             final_label = None
             final_confidence = None
             if fused_result is not None:
@@ -318,14 +318,29 @@ class ReportAPIView(APIView):
                 "details": details,
             }
 
+            # Generate PDF and save to media folder
             pdf_bytes = utils.generate_pdf_report(
                 prediction=resp,
                 spectrogram_bytes=spectrogram_bytes,
                 heatmap_bytes=heatmap_bytes
             )
-            return HttpResponse(pdf_bytes, content_type="application/pdf")
+
+            # Ensure MEDIA_ROOT exists
+            media_root = getattr(settings, "MEDIA_ROOT", "media")
+            os.makedirs(media_root, exist_ok=True)
+
+            # Save PDF file
+            filename = f"parkinson_report_{tempfile.mktemp()[-8:]}.pdf"  # unique filename
+            file_path = os.path.join(media_root, filename)
+            with open(file_path, "wb") as f:
+                f.write(pdf_bytes)
+
+            # Return prediction and filename for frontend download
+            resp["report_file"] = filename
+            return Response(resp, status=status.HTTP_200_OK)
 
         finally:
+            # Clean up temporary files
             for p in (tmp_audio_path, tmp_image_path):
                 try:
                     if p and os.path.exists(p):
@@ -335,6 +350,9 @@ class ReportAPIView(APIView):
 
 
 class DownloadReportView(APIView):
+    """
+    Download previously generated report from MEDIA_ROOT
+    """
     def get(self, request, filename):
         media_root = getattr(settings, "MEDIA_ROOT", "media")
         file_path = os.path.join(media_root, filename)

@@ -4,7 +4,7 @@ import axios from "axios";
 // ✅ Base URL — Django backend
 const API_BASE = "http://127.0.0.1:8000/api";
 const PREDICTOR_API = `${API_BASE}/predictor`;
-const AUTH_API = `${API_BASE}/auth`; // Correct endpoint for auth routes
+const AUTH_API = `${API_BASE}/auth`;
 
 // ✅ Helper: Attach auth token safely
 const authHeader = () => {
@@ -12,11 +12,46 @@ const authHeader = () => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
+// ✅ Helper: Refresh access token
+const refreshToken = async () => {
+  const refresh = localStorage.getItem("refresh");
+  if (!refresh) return false;
+
+  try {
+    const response = await axios.post(`${AUTH_API}/token/refresh/`, { refresh });
+    localStorage.setItem("access", response.data.access);
+    return true;
+  } catch (err) {
+    console.error("❌ Refresh token failed:", err);
+    return false;
+  }
+};
+
+// ✅ Helper: Make request with automatic token refresh
+const requestWithRetry = async (axiosRequest) => {
+  try {
+    return await axiosRequest();
+  } catch (err) {
+    // Check if error is 401 Unauthorized due to expired token
+    if (err.response && err.response.status === 401) {
+      const refreshed = await refreshToken();
+      if (refreshed) {
+        // Retry original request after refreshing token
+        return await axiosRequest();
+      }
+    }
+    throw err;
+  }
+};
+
 // 🧠 Predict Parkinson’s Disease
 export const predictParkinsons = async (formData) => {
-  const headers = { "Content-Type": "multipart/form-data", ...authHeader() };
   try {
-    const response = await axios.post(`${PREDICTOR_API}/predict/`, formData, { headers });
+    const response = await requestWithRetry(() =>
+      axios.post(`${PREDICTOR_API}/predict/`, formData, {
+        headers: { "Content-Type": "multipart/form-data", ...authHeader() },
+      })
+    );
     return response;
   } catch (error) {
     return handleApiError(error, "Prediction failed");
@@ -25,9 +60,10 @@ export const predictParkinsons = async (formData) => {
 
 // 📊 Fetch Results
 export const fetchResults = async () => {
-  const headers = { ...authHeader() };
   try {
-    const response = await axios.get(`${PREDICTOR_API}/results/`, { headers });
+    const response = await requestWithRetry(() =>
+      axios.get(`${PREDICTOR_API}/results/`, { headers: { ...authHeader() } })
+    );
     return response.data;
   } catch (error) {
     return handleApiError(error, "Failed to fetch results");
@@ -38,6 +74,9 @@ export const fetchResults = async () => {
 export const loginUser = async (formData) => {
   try {
     const response = await axios.post(`${AUTH_API}/login/`, formData);
+    // Save tokens in localStorage
+    localStorage.setItem("access", response.data.access);
+    localStorage.setItem("refresh", response.data.refresh);
     return response.data;
   } catch (error) {
     return handleApiError(error, "Login failed");
@@ -54,23 +93,44 @@ export const registerUser = async (formData) => {
   }
 };
 
+// 📝 Download Parkinson’s Prediction Report
+export const downloadReport = async (reportName) => {
+  try {
+    const response = await requestWithRetry(() =>
+      axios.get(`${PREDICTOR_API}/download/${reportName}/`, {
+        headers: { ...authHeader() },
+        responseType: "blob",
+      })
+    );
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", reportName);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    return { success: true };
+  } catch (error) {
+    return handleApiError(error, "Failed to download report");
+  }
+};
+
 // 🧩 Centralized error handler
 const handleApiError = (error, fallbackMessage) => {
   console.error("API Error:", error);
 
-  // Default response object
   const safeResponse = { success: false, error: fallbackMessage };
 
   if (error.response) {
     const data = error.response.data;
 
-    // HTML error (like 404 pages)
     if (typeof data === "string" && data.startsWith("<!DOCTYPE html")) {
       safeResponse.error = `${fallbackMessage}. Server route not found.`;
       return safeResponse;
     }
 
-    // Django REST validation error
     if (typeof data === "object") {
       const combined = Object.values(data).flat().join(" ");
       safeResponse.error = `${fallbackMessage}. ${combined}`;
