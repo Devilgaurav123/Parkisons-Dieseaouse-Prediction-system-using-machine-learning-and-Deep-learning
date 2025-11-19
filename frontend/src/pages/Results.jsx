@@ -14,12 +14,9 @@ const Results = () => {
       try {
         const storedResult = localStorage.getItem("latest_result");
         if (storedResult && storedResult !== "undefined" && storedResult !== "null") {
-          const parsedResult = JSON.parse(storedResult);
-          console.log("Stored result:", parsedResult);
-          setResult(parsedResult);
+          setResult(JSON.parse(storedResult));
         } else {
           const data = await fetchResults();
-          console.log("Fetched results:", data);
           setResult(data && data.length ? data[data.length - 1] : null);
         }
       } catch (err) {
@@ -41,13 +38,11 @@ const Results = () => {
       const token = localStorage.getItem("access");
       if (!token) throw new Error("No access token found. Please log in.");
 
-      // Fetch PDF using axios with JWT
       const response = await axios.get(result.report_url, {
         headers: { Authorization: `Bearer ${token}` },
-        responseType: "blob", // Important for PDF
+        responseType: "blob",
       });
 
-      // Create a blob and download
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
@@ -90,9 +85,11 @@ const Results = () => {
       </div>
     );
 
-  const isParkinsons =
-    result.result?.toLowerCase().includes("parkinson") ||
-    result.prediction?.toLowerCase().includes("parkinson");
+  const CONFIDENCE = result.final_confidence || 0;
+  const isParkinsons = result.final_label === 1;
+
+  // Borderline warning: probability between 0.4 and 0.5
+  const borderline = !isParkinsons && CONFIDENCE >= 0.4 && CONFIDENCE < 0.5;
 
   return (
     <div className="center-wrapper">
@@ -102,16 +99,17 @@ const Results = () => {
         <div className="result-status">
           {isParkinsons ? (
             <h3 className="result-bad">⚠️ Parkinson’s Detected</h3>
+          ) : borderline ? (
+            <h3 className="result-warning">
+              ⚠️ Borderline prediction — Parkinson’s might be present
+            </h3>
           ) : (
             <h3 className="result-good">✅ Healthy — No Parkinson’s Detected</h3>
           )}
         </div>
 
         <p>
-          <strong>Confidence:</strong>{" "}
-          {result.final_confidence
-            ? `${(result.final_confidence * 100).toFixed(2)}%`
-            : "N/A"}
+          <strong>Confidence:</strong> {CONFIDENCE ? `${(CONFIDENCE * 100).toFixed(2)}%` : "N/A"}
         </p>
 
         {result.user && (

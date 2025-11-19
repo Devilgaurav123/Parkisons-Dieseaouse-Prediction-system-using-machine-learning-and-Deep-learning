@@ -32,11 +32,10 @@ const requestWithRetry = async (axiosRequest) => {
   try {
     return await axiosRequest();
   } catch (err) {
-    // Check if error is 401 Unauthorized due to expired token
+    // Retry if token expired
     if (err.response && err.response.status === 401) {
       const refreshed = await refreshToken();
       if (refreshed) {
-        // Retry original request after refreshing token
         return await axiosRequest();
       }
     }
@@ -52,7 +51,14 @@ export const predictParkinsons = async (formData) => {
         headers: { "Content-Type": "multipart/form-data", ...authHeader() },
       })
     );
-    return response;
+
+    // Ensure consistent report property for frontend
+    const data = response.data;
+    if (data.report_file && !data.report_url) {
+      data.report_url = `${PREDICTOR_API}/download/${data.report_file}/`;
+    }
+
+    return { data, status: response.status };
   } catch (error) {
     return handleApiError(error, "Prediction failed");
   }
@@ -74,7 +80,6 @@ export const fetchResults = async () => {
 export const loginUser = async (formData) => {
   try {
     const response = await axios.post(`${AUTH_API}/login/`, formData);
-    // Save tokens in localStorage
     localStorage.setItem("access", response.data.access);
     localStorage.setItem("refresh", response.data.refresh);
     return response.data;
@@ -146,6 +151,5 @@ const handleApiError = (error, fallbackMessage) => {
     return safeResponse;
   }
 
-  safeResponse.error = fallbackMessage;
   return safeResponse;
 };

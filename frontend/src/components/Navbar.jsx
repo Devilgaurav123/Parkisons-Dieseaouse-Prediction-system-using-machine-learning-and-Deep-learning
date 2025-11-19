@@ -28,15 +28,16 @@ export default function Navbar() {
           <li>
             <Link to="/home">Home</Link>
           </li>
+           <li>
+            <Link to="/about">About</Link>
+          </li>
           <li>
             <Link to="/upload">Upload</Link>
           </li>
           <li>
             <Link to="/results">Results</Link>
           </li>
-          <li>
-            <Link to="/about">About</Link>
-          </li>
+         
           <li>
             <button className="logout-btn" onClick={handleLogout}>
               Logout

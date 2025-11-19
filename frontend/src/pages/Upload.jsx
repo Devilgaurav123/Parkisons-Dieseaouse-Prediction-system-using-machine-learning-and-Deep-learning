@@ -26,30 +26,32 @@ export default function Upload() {
     setLoading(true);
     setError("");
 
-    const formData = new FormData();
-    if (audioFile) formData.append("audio_file", audioFile);
-    if (imageFile) formData.append("image_file", imageFile);
-    formData.append("use_audio", !!audioFile);
-    formData.append("use_image", !!imageFile);
-    formData.append("combine_features", true);
-    formData.append("return_spectrogram", true);
-    formData.append("return_heatmap", true);
-    formData.append("generate_report", true);
-
     try {
+      const formData = new FormData();
+      if (audioFile) formData.append("audio_file", audioFile);
+      if (imageFile) formData.append("image_file", imageFile);
+
+      // Send flags as strings, not booleans
+      formData.append("use_audio", audioFile ? "true" : "false");
+      formData.append("use_image", imageFile ? "true" : "false");
+      formData.append("combine_features", "true");
+      formData.append("return_spectrogram", "true");
+      formData.append("return_heatmap", "true");
+      formData.append("generate_report", "true");
+
       const prediction = await predictParkinsons(formData);
+
       console.log("✅ Prediction data:", prediction);
 
-      // Verify we got a report URL
-      const reportAvailable = prediction?.data?.report_url;
-      if (!reportAvailable) {
+      // Check report URL
+      if (!prediction?.data?.report_url && !prediction?.data?.report_file) {
         setError("❌ No report generated.");
       }
 
-      // Save result safely for Results page
+      // Save result for Results page
       localStorage.setItem("latest_result", JSON.stringify(prediction.data));
 
-      // Delay slightly to avoid race with navigation
+      // Slight delay before navigating
       setTimeout(() => navigate("/results"), 300);
     } catch (err) {
       console.error("❌ Upload error:", err);

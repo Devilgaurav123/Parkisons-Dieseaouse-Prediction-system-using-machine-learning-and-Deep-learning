@@ -222,7 +222,6 @@ class SpectrogramAPIView(APIView):
             except Exception:
                 pass
 
-
 class ReportAPIView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
@@ -246,7 +245,7 @@ class ReportAPIView(APIView):
             details = {}
             audio_result = image_result = fused_result = None
 
-            # audio prediction
+            # --- AUDIO PREDICTION ---
             if use_audio and audio_file:
                 tmp_audio = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
                 tmp_audio.write(audio_file.read())
@@ -260,7 +259,7 @@ class ReportAPIView(APIView):
                 except Exception:
                     spectrogram_bytes = None
 
-            # image prediction
+            # --- IMAGE PREDICTION ---
             if use_image and image_file:
                 tmp_image = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
                 tmp_image.write(image_file.read())
@@ -278,69 +277,85 @@ class ReportAPIView(APIView):
                 except Exception as e:
                     details["image_error"] = f"Cannot open image: {str(e)}"
 
-            # fused prediction
+            # --- FUSED PREDICTION ---
             if tmp_audio_path and tmp_image_path:
                 fused_result, fused_err = utils.predict_fused(tmp_audio_path, tmp_image_path)
                 if fused_err:
                     details["fusion_error"] = fused_err
 
-            # final label and confidence
-            final_label = None
-            final_confidence = None
-            if fused_result is not None:
-                final_label = int(fused_result.get("label", 0))
-                final_confidence = fused_result.get("probability")
-            elif audio_result or image_result:
-                if audio_result and image_result:
-                    a_label = int(audio_result.get("label", 0))
-                    i_label = int(image_result.get("label", 0))
-                    final_label = 1 if (a_label == 1 or i_label == 1) else 0
-                    probs = [p.get("probability") for p in (audio_result, image_result)
-                             if p.get("probability") is not None]
-                    final_confidence = max(probs) if probs else None
-                elif audio_result:
-                    final_label = int(audio_result.get("label", 0))
-                    final_confidence = audio_result.get("probability")
-                elif image_result:
-                    final_label = int(image_result.get("label", 0))
-                    final_confidence = image_result.get("probability")
+            # --- FINAL LABEL & CONFIDENCE ---
+            final_confidence = 0.0
+            final_label = 0
+            borderline_flag = False
+
+            # Compute final confidence using max probability across all available predictions
+            probs = []
+            if fused_result and "probability" in fused_result:
+                probs.append(fused_result["probability"])
+            if audio_result and "probability" in audio_result:
+                probs.append(audio_result["probability"])
+            if image_result and "probability" in image_result:
+                probs.append(image_result["probability"])
+
+            if probs:
+                final_confidence = max(probs)
             else:
-                return Response({"error": "No valid prediction", "details": details},
-                                status=status.HTTP_400_BAD_REQUEST)
+                final_confidence = 0.0
+
+            # Threshold logic
+            THRESHOLD = 0.5
+            BORDERLINE_LOWER = 0.45  # optional for borderline detection
+            if final_confidence >= THRESHOLD:
+                final_label = 1
+            elif final_confidence >= BORDERLINE_LOWER:
+                final_label = 0
+                borderline_flag = True
+            else:
+                final_label = 0
+
+            # --- DEBUG LOGS ---
+            print("=== DEBUG PREDICTION ===")
+            print("Audio result:", audio_result)
+            print("Image result:", image_result)
+            print("Fused result:", fused_result)
+            print("Final confidence:", final_confidence)
+            print("Final label:", final_label)
+            print("Borderline:", borderline_flag)
+            print("========================\n")
 
             resp = {
-                "result": "Parkinsons" if int(final_label) == 1 else "No Parkinsons",
-                "final_label": int(final_label),
-                "final_confidence": float(final_confidence) if final_confidence is not None else None,
+                "result": "Parkinsons" if final_label == 1 else "No Parkinsons",
+                "final_label": final_label,
+                "final_confidence": float(final_confidence),
+                "borderline": borderline_flag,
                 "audio_prediction": audio_result,
                 "image_prediction": image_result,
                 "fused_prediction": fused_result,
                 "details": details,
             }
 
-            # Generate PDF and save to media folder
+            # --- GENERATE PDF REPORT ---
             pdf_bytes = utils.generate_pdf_report(
                 prediction=resp,
                 spectrogram_bytes=spectrogram_bytes,
                 heatmap_bytes=heatmap_bytes
             )
 
-            # Ensure MEDIA_ROOT exists
+            # Save PDF to media folder
             media_root = getattr(settings, "MEDIA_ROOT", "media")
             os.makedirs(media_root, exist_ok=True)
-
-            # Save PDF file
-            filename = f"parkinson_report_{tempfile.mktemp()[-8:]}.pdf"  # unique filename
+            filename = f"parkinson_report_{tempfile.mktemp()[-8:]}.pdf"
             file_path = os.path.join(media_root, filename)
             with open(file_path, "wb") as f:
                 f.write(pdf_bytes)
 
-            # Return prediction and filename for frontend download
             resp["report_file"] = filename
+            resp["report_url"] = request.build_absolute_uri(f"/api/predictor/download/{filename}/")
+
             return Response(resp, status=status.HTTP_200_OK)
 
         finally:
-            # Clean up temporary files
+            # Cleanup temporary files
             for p in (tmp_audio_path, tmp_image_path):
                 try:
                     if p and os.path.exists(p):

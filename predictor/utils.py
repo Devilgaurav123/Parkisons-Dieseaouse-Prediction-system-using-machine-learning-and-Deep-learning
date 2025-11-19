@@ -84,10 +84,9 @@ def load_fusion_model(path=None):
             logger.warning(f"Fusion model not found at {path}")
     return _fusion_model
 
-
-# ============================================================
+# ===============================
 # FEATURE EXTRACTION
-# ============================================================
+# ===============================
 def compute_pitch_stats(sound):
     try:
         pitch = call(sound, "To Pitch", 0.0, 75, 600)
@@ -154,10 +153,9 @@ def extract_audio_features(file_path, sr=22050):
         logger.exception(f"Feature extraction failed: {e}")
         return np.zeros((1, 40), dtype=np.float32)
 
-
-# ============================================================
+# ===============================
 # PREDICTORS
-# ============================================================
+# ===============================
 def predict_audio_from_file(file_path):
     model = load_audio_model()
     if model is None:
@@ -180,7 +178,7 @@ def predict_image_from_pil(pil_img):
     try:
         model = load_image_model()
         if model is None:
-            return {"label": 0, "probability": 0.5}, None
+            return {"label": 0, "probability": 0.0}, None  # safer default
         img = pil_img.convert("RGB").resize((224, 224))
         arr = keras_image.img_to_array(img)
         arr = np.expand_dims(arr, axis=0) / 255.0
@@ -198,16 +196,18 @@ def predict_fused(audio_path, image_path):
         audio_res, _ = predict_audio_from_file(audio_path)
         img = Image.open(image_path)
         image_res, _ = predict_image_from_pil(img)
-        a = audio_res["probability"] or 0.5
-        i = image_res["probability"] or 0.5
-        prob = (a + i) / 2
+
+        # --- FIXED: use max probability across modalities ---
+        a_prob = float(audio_res["probability"]) if audio_res and audio_res.get("probability") is not None else 0.0
+        i_prob = float(image_res["probability"]) if image_res and image_res.get("probability") is not None else 0.0
+
+        prob = max(a_prob, i_prob)
         label = 1 if prob >= 0.5 else 0
+
         return {"label": label, "probability": prob}, None
     except Exception as e:
         logger.exception(f"Fusion prediction failed: {e}")
         return None, str(e)
-
-
 # ============================================================
 # SPECTROGRAM GENERATION
 # ============================================================
@@ -230,16 +230,23 @@ def audio_spectrogram_bytes(audio_path):
 
 
 # ============================================================
-# ✅ FIXED PDF REPORT GENERATOR
+# ✅ FIXED PDF REPORT GENERATOR WITH BORDERLINE SUPPORT
 # ============================================================
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.utils import ImageReader
+import io
+
 def generate_pdf_report(prediction, spectrogram_bytes=None, heatmap_bytes=None, user_info=None):
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
 
+    # Title
     p.setFont("Helvetica-Bold", 18)
     p.drawString(50, height - 60, "🧠 Parkinson’s Disease Prediction Report")
 
+    # User info
     p.setFont("Helvetica", 12)
     y = height - 100
     if user_info:
@@ -251,13 +258,27 @@ def generate_pdf_report(prediction, spectrogram_bytes=None, heatmap_bytes=None, 
     p.line(50, y, width - 50, y)
     y -= 30
 
+    # Prediction result with borderline support
     p.setFont("Helvetica-Bold", 14)
-    p.drawString(50, y, f"Prediction Result: {prediction.get('result', 'N/A')}")
+    if prediction.get("final_label") == 1:
+        result_text = "⚠️ Parkinsons Detected"
+    elif prediction.get("borderline", False):
+        result_text = "⚠️ Borderline — Parkinson’s might be present"
+    else:
+        result_text = "✅ No Parkinsons"
+    p.drawString(50, y, f"Prediction Result: {result_text}")
     y -= 25
+
+    # Confidence
     p.setFont("Helvetica", 12)
-    p.drawString(50, y, f"Confidence: {prediction.get('final_confidence', 'N/A')}")
+    confidence = prediction.get("final_confidence")
+    if confidence is not None:
+        p.drawString(50, y, f"Confidence: {(confidence*100):.2f}%")
+    else:
+        p.drawString(50, y, "Confidence: N/A")
     y -= 40
 
+    # Spectrogram
     if spectrogram_bytes:
         try:
             image = ImageReader(io.BytesIO(spectrogram_bytes))
@@ -271,6 +292,7 @@ def generate_pdf_report(prediction, spectrogram_bytes=None, heatmap_bytes=None, 
             y -= 30
             p.setFillColorRGB(0, 0, 0)
 
+    # Heatmap
     if heatmap_bytes:
         try:
             image = ImageReader(io.BytesIO(heatmap_bytes))
@@ -283,6 +305,7 @@ def generate_pdf_report(prediction, spectrogram_bytes=None, heatmap_bytes=None, 
             y -= 30
             p.setFillColorRGB(0, 0, 0)
 
+    # Finalize PDF
     p.showPage()
     p.save()
     buffer.seek(0)
