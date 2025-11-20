@@ -31,13 +31,13 @@ export default function Upload() {
       if (audioFile) formData.append("audio_file", audioFile);
       if (imageFile) formData.append("image_file", imageFile);
 
-      // Send flags as strings, not booleans
-      formData.append("use_audio", audioFile ? "true" : "false");
-      formData.append("use_image", imageFile ? "true" : "false");
-      formData.append("combine_features", "true");
-      formData.append("return_spectrogram", "true");
-      formData.append("return_heatmap", "true");
-      formData.append("generate_report", "true");
+      // Send flags as booleans, not as strings
+      formData.append("use_audio", audioFile ? true : false);
+      formData.append("use_image", imageFile ? true : false);
+      formData.append("combine_features", true);  // Send as boolean
+      formData.append("return_spectrogram", true); // Send as boolean
+      formData.append("return_heatmap", true); // Send as boolean
+      formData.append("generate_report", true); // Send as boolean
 
       const prediction = await predictParkinsons(formData);
 
@@ -46,6 +46,7 @@ export default function Upload() {
       // Check report URL
       if (!prediction?.data?.report_url && !prediction?.data?.report_file) {
         setError("❌ No report generated.");
+        return;
       }
 
       // Save result for Results page

@@ -232,11 +232,6 @@ def audio_spectrogram_bytes(audio_path):
 # ============================================================
 # ✅ FIXED PDF REPORT GENERATOR WITH BORDERLINE SUPPORT
 # ============================================================
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.utils import ImageReader
-import io
-
 def generate_pdf_report(prediction, spectrogram_bytes=None, heatmap_bytes=None, user_info=None):
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer, pagesize=A4)
@@ -246,26 +241,37 @@ def generate_pdf_report(prediction, spectrogram_bytes=None, heatmap_bytes=None, 
     p.setFont("Helvetica-Bold", 18)
     p.drawString(50, height - 60, "🧠 Parkinson’s Disease Prediction Report")
 
-    # User info
+    # User info (display name, email, and phone)
     p.setFont("Helvetica", 12)
     y = height - 100
     if user_info:
-        for key, value in user_info.items():
-            p.drawString(50, y, f"{key.capitalize()}: {value}")
-            y -= 20
+        name = user_info.get("name", "Unknown")
+        email = user_info.get("email", "N/A")
+        phone = user_info.get("phone", "N/A")
+        test_date = user_info.get("test_date", "N/A")
+        
+        # Drawing user information
+        p.drawString(50, y, f"Name: {name}")
+        y -= 20
+        p.drawString(50, y, f"Email: {email}")
+        y -= 20
+        p.drawString(50, y, f"Phone: {phone}")
+        y -= 20
+        p.drawString(50, y, f"Test Date: {test_date}")
+        y -= 40  # Increased spacing after user information
 
-    y -= 10
+    # Line separating user info from prediction result
     p.line(50, y, width - 50, y)
-    y -= 30
+    y -= 20
 
     # Prediction result with borderline support
     p.setFont("Helvetica-Bold", 14)
     if prediction.get("final_label") == 1:
-        result_text = "⚠️ Parkinsons Detected"
+        result_text = "⚠️ Parkinson's Detected"
     elif prediction.get("borderline", False):
         result_text = "⚠️ Borderline — Parkinson’s might be present"
     else:
-        result_text = "✅ No Parkinsons"
+        result_text = "✅ No Parkinson’s"
     p.drawString(50, y, f"Prediction Result: {result_text}")
     y -= 25
 
@@ -273,12 +279,12 @@ def generate_pdf_report(prediction, spectrogram_bytes=None, heatmap_bytes=None, 
     p.setFont("Helvetica", 12)
     confidence = prediction.get("final_confidence")
     if confidence is not None:
-        p.drawString(50, y, f"Confidence: {(confidence*100):.2f}%")
+        p.drawString(50, y, f"Confidence: {(confidence * 100):.2f}%")
     else:
         p.drawString(50, y, "Confidence: N/A")
     y -= 40
 
-    # Spectrogram
+    # Spectrogram (if available)
     if spectrogram_bytes:
         try:
             image = ImageReader(io.BytesIO(spectrogram_bytes))
@@ -292,7 +298,7 @@ def generate_pdf_report(prediction, spectrogram_bytes=None, heatmap_bytes=None, 
             y -= 30
             p.setFillColorRGB(0, 0, 0)
 
-    # Heatmap
+    # Heatmap (if available)
     if heatmap_bytes:
         try:
             image = ImageReader(io.BytesIO(heatmap_bytes))

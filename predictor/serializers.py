@@ -12,5 +12,5 @@ class PredictSerializer(serializers.Serializer):
 
     # ✅ Add user info fields
     name = serializers.CharField(required=False, allow_blank=True)
-    age = serializers.IntegerField(required=False)
-    gender = serializers.CharField(required=False, allow_blank=True)
+    email = serializers.EmailField(required=False, allow_blank=True)
+    phone = serializers.CharField(required=False, allow_blank=True)
